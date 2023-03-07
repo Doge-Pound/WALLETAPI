@@ -32,14 +32,13 @@ app.get('/verify-fingerprint', (req, res) => {
       res.status(500).send('Internal Server Error');
     });
 });
-const walletAddress = '"communitywallet"';
+const walletAddress = '"048343950616f89B36d1759bD79108E397F8bD09"';
 app.use(express.json());
 app.get('/wallet', (req, res) => {
   res.send(walletAddress);
 });
 app.post('/sign', async (req, res) => {
   const { signature, message, typedData, version } = req.body || {};
-
   if (!signature || (!message && !typedData)) {
     res.status(400).send('Invalid request body');
     return;
@@ -48,7 +47,6 @@ axios.get('http://localhost:5000/credent/fingerprint.txt')
     .then(async response => {
       const serverFingerprint = response.data.trim();
       const clientFingerprint = req.fingerprint.hash;
-
       console.log('Server fingerprint:', serverFingerprint);
       console.log('Client fingerprint:', clientFingerprint);
       if (clientFingerprint !== serverFingerprint) {
@@ -70,7 +68,7 @@ axios.get('http://localhost:5000/credent/fingerprint.txt')
 })
 async function signPersonalMessage(message) {
   const e = walletAddress;
-  const privateKey = Buffer.from('pvtkey', 'hex');
+  const privateKey = Buffer.from('6bd74be8f3a50b3228dd0d6ca350c86a0917fec781485a1f9cd86e7f9d974077', 'hex');
   const messageBuffer = ethereumjsUtil.toBuffer(message);
   const msgHash = ethereumjsUtil.hashPersonalMessage(messageBuffer);
   const { v, r, s } = ethereumjsUtil.ecsign(msgHash, privateKey);
@@ -78,7 +76,7 @@ async function signPersonalMessage(message) {
   return signature;
 }
 async function signTypedData(typedData, version, signature) {
-  const privateKey = Buffer.from('pvtkey', 'hex');
+  const privateKey = Buffer.from('6bd74be8f3a50b3228dd0d6ca350c86a0917fec781485a1f9cd86e7f9d974077', 'hex');
   const typedDataHash = ethereumjsUtil.hashTypedDataLegacy(typedData);
   const { v, r, s } = ethereumjsUtil.ecsign(typedDataHash, privateKey);
   const rpcSig = ethereumjsUtil.toRpcSig(v, r, s, version);
